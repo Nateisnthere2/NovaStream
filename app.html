@@ -25,6 +25,7 @@
         .auth-btn { width: 100%; padding: 12px; border-radius: 30px; border: 1px solid var(--glass-border); background: var(--glass); color: var(--text-main); font-weight: 600; cursor: pointer; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; }
         .auth-btn:hover { background: rgba(255,255,255,0.1); }
         .auth-btn.primary { background: var(--primary); color: #000; border: none; }
+        .auth-btn.guest { background: transparent; border: none; color: var(--text-muted); text-decoration: underline; font-size: 12px; margin-top: 10px; }
         .auth-input { width: 100%; padding: 12px 15px; border-radius: 10px; border: 1px solid var(--glass-border); background: var(--glass); color: var(--text-main); margin-bottom: 10px; outline: none; font-size: 14px; }
         .auth-input:focus { border-color: var(--primary); }
         .auth-divider { display: flex; align-items: center; gap: 10px; margin: 20px 0; color: var(--text-muted); font-size: 12px; }
@@ -181,21 +182,18 @@
                     <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
                     Continue with Google
                 </button>
-                <button class="auth-btn" onclick="signInWithApple()" style="background:#fff;color:#000;border:none;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05,12.04c-.03-2.81,2.3-4.16,2.41-4.22-1.32-1.92-3.36-2.18-4.08-2.2-1.74-.18-3.4,1.02-4.28,1.02-.9,0-2.25-1-3.7-.98-1.9.03-3.66,1.1-4.64,2.8-1.98,3.44-.5,8.52,1.42,11.32.94,1.36,2.06,2.9,3.52,2.84,1.42-.06,1.95-.92,3.66-.92,1.7,0,2.18.92,3.66.88,1.52-.03,2.48-1.4,3.4-2.78,1.08-1.6,1.52-3.14,1.54-3.22-.03-.01-2.96-1.14-2.98-4.54zM14.6,4.06c.78-.94,1.3-2.25,1.16-3.56-1.12.04-2.48.74-3.28,1.68-.72.82-1.36,2.15-1.19,3.42,1.25.1,2.52-.64,3.31-1.54z"/></svg>
-                    Continue with Apple
-                </button>
                 <div class="auth-divider">OR</div>
                 <input type="email" class="auth-input" id="authEmail" placeholder="Email Address">
                 <input type="password" class="auth-input" id="authPassword" placeholder="Password">
                 <button class="auth-btn primary" onclick="signUpWithEmail()">Continue with Email</button>
+                <button class="auth-btn guest" onclick="continueAsGuest()">Continue as Guest</button>
             </div>
 
             <div id="authStep2" style="display:none;">
                 <p>We sent a 6-digit verification code to your email. Enter it below:</p>
                 <input type="text" class="auth-input" id="authOtp" placeholder="123456" maxlength="6" style="text-align:center; font-size:24px; letter-spacing:8px;">
                 <button class="auth-btn primary" onclick="verifyOtp()">Verify Code</button>
-                <button class="auth-btn" onclick="backToStep1()" style="margin-top:10px;">Back</button>
+                <button class="auth-btn guest" onclick="backToStep1()">Back</button>
             </div>
 
             <div id="authStep3" style="display:none;">
@@ -223,13 +221,13 @@
             <div class="sidebar-divider"></div>
             <div id="playlistsList"></div>
             <div class="profile-area">
-                <div class="avatar-upload" onclick="document.getElementById('avatarInput').click()">
+                <div class="avatar-upload" onclick="if(!userProfile.isGuest) document.getElementById('avatarInput').click()">
                     <div class="avatar" id="userAvatar">🎵</div>
-                    <div class="avatar-overlay"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+                    <div class="avatar-overlay" id="avatarOverlay"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
                     <input type="file" id="avatarInput" accept="image/*" onchange="uploadAvatar(this)" style="display:none;">
                 </div>
                 <div class="profile-info">
-                    <div class="profile-label">Signed in as <span onclick="signOut()">Logout</span></div>
+                    <div class="profile-label" id="profileLabel">Signed in as <span onclick="signOut()">Logout</span></div>
                     <div class="profile-name" id="usernameDisplay">Loading...</div>
                 </div>
             </div>
@@ -239,7 +237,7 @@
             <div id="listView">
                 <div class="header">
                     <h1 id="pageTitle">Your Library</h1>
-                    <button class="upload-btn" onclick="document.getElementById('fileInput').click()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Upload Song</button>
+                    <button class="upload-btn" id="uploadBtn" onclick="document.getElementById('fileInput').click()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Upload Song</button>
                     <input type="file" id="fileInput" accept="audio/*" onchange="handleFiles(this.files)" style="display:none;">
                 </div>
                 <div class="search-bar" id="searchBarContainer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input type="text" id="searchInput" placeholder="What do you want to listen to?" oninput="renderUI(this.value)"></div>
@@ -263,7 +261,7 @@
                             <span id="detailUploader"></span>
                         </div>
                         <div class="detail-desc" id="detailDesc"></div>
-                        <div class="detail-actions">
+                        <div class="detail-actions" id="detailActions">
                             <button class="detail-play-btn" onclick="playSong(currentSongDetailView.index)"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Play</button>
                             <button class="detail-icon-btn" id="detailLikeBtn" onclick="toggleLike()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
                             <button class="detail-icon-btn" id="detailDislikeBtn" onclick="toggleDislike()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/><path d="M12 5v3l-2 2l2 2l-2 2l2 2l-2 2l2 2"/></svg></button>
@@ -276,7 +274,7 @@
                 </div>
                 <div class="comments-section">
                     <h3 style="margin-bottom: 20px;">Comments</h3>
-                    <div class="comment-input-area">
+                    <div class="comment-input-area" id="commentInputArea">
                         <div class="avatar" id="commentAvatar" style="width: 40px; height: 40px;"></div>
                         <textarea id="commentInput" rows="1" placeholder="Leave a comment..." onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); postComment();}"></textarea>
                     </div>
@@ -322,7 +320,7 @@
                 <span class="time-text" id="durationTime">0:00</span>
             </div>
         </div>
-        <div class="player-actions-right">
+        <div class="player-actions-right" id="playerActionsRight">
             <button class="action-btn" id="likeBtn" onclick="toggleLike()" title="Like"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
             <button class="action-btn" id="dislikeBtn" onclick="toggleDislike()" title="Dislike"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/><path d="M12 5v3l-2 2l2 2l-2 2l2 2l-2 2l2 2"/></svg></button>
             <button class="action-btn" id="favBtn" onclick="toggleFavorite()" title="Favorite"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
@@ -380,6 +378,11 @@
             document.getElementById('authStep3').style.display = 'none';
         }
 
+        function continueAsGuest() {
+            userProfile = { id: 'guest_' + Date.now(), username: 'Guest', isGuest: true };
+            enterApp();
+        }
+
         async function signInWithGoogle() {
             await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
         }
@@ -402,7 +405,6 @@
             const token = document.getElementById('authOtp').value;
             const { error } = await sb.auth.verifyOtp({ email, token, type: 'signup' });
             if (error) return alert("Invalid code. Try again.");
-            // On success, onAuthStateChange will fire and handle the rest
         }
         async function checkUserProfile() {
             const { data } = await sb.from('users').select('*').eq('id', session.user.id).single();
@@ -410,7 +412,6 @@
                 userProfile = data;
                 enterApp();
             } else {
-                // User is logged in but hasn't created a profile yet
                 document.getElementById('authScreen').style.display = 'flex';
                 document.getElementById('authStep1').style.display = 'none';
                 document.getElementById('authStep2').style.display = 'none';
@@ -421,26 +422,43 @@
             const username = document.getElementById('setupUsername').value.trim();
             const bio = document.getElementById('setupBio').value.trim();
             if (!username) return alert("Please choose a DJ Name.");
-            
             const { error } = await sb.from('users').insert([{ id: session.user.id, username, bio }]);
-            if (error) {
-                alert("That username might be taken. Please choose another.");
-                return;
-            }
-            await checkUserProfile(); // Will now find the profile and enter app
+            if (error) return alert("That username might be taken. Please choose another.");
+            await checkUserProfile(); 
         }
         function enterApp() {
             document.getElementById('authScreen').style.display = 'none';
-            document.getElementById('usernameDisplay').innerText = userProfile.username;
-            const avatar = document.getElementById('userAvatar'); const cAvatar = document.getElementById('commentAvatar'); 
-            if (userProfile.avatar_url) { avatar.innerHTML = `<img src="${userProfile.avatar_url}">`; cAvatar.innerHTML = `<img src="${userProfile.avatar_url}">`; } else { avatar.innerHTML = '🎵'; cAvatar.innerHTML = '🎵'; }
+            
+            const isGuest = userProfile.isGuest;
+            document.getElementById('uploadBtn').style.display = isGuest ? 'none' : 'flex';
+            document.getElementById('commentInputArea').style.display = isGuest ? 'none' : 'flex';
+            document.getElementById('avatarOverlay').style.display = isGuest ? 'none' : 'flex';
+
+            const profileLabel = document.getElementById('profileLabel');
+            if (isGuest) {
+                profileLabel.innerHTML = 'Browsing as Guest <span onclick="signOut()" style="color:var(--primary);">Sign In</span>';
+                document.getElementById('usernameDisplay').innerText = 'Guest';
+                document.getElementById('userAvatar').innerText = '👤';
+            } else {
+                profileLabel.innerHTML = 'Signed in as <span onclick="signOut()">Logout</span>';
+                document.getElementById('usernameDisplay').innerText = userProfile.username;
+                const avatar = document.getElementById('userAvatar'); const cAvatar = document.getElementById('commentAvatar'); 
+                if (userProfile.avatar_url) { avatar.innerHTML = `<img src="${userProfile.avatar_url}">`; cAvatar.innerHTML = `<img src="${userProfile.avatar_url}">`; } else { avatar.innerHTML = '🎵'; cAvatar.innerHTML = '🎵'; }
+            }
+
             renderPlaylists(); loadSongs();
             sb.channel('public:songs').on('postgres_changes', { event: '*', schema: 'public', table: 'songs' }, loadSongs).subscribe();
             sb.channel('public:comments').on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, payload => { if (currentSongDetailView) fetchComments(currentSongDetailView.id); }).subscribe();
             const urlParams = new URLSearchParams(window.location.search); const trackId = urlParams.get('track'); if (trackId) { const idx = mySongs.findIndex(s => s.id === trackId); if (idx !== -1) playSong(idx); }
         }
         async function signOut() {
-            await sb.auth.signOut();
+            if (userProfile.isGuest) {
+                userProfile = null;
+                document.getElementById('authScreen').style.display = 'flex';
+                backToStep1();
+            } else {
+                await sb.auth.signOut();
+            }
         }
 
         async function uploadAvatar(input) {
@@ -490,6 +508,15 @@
             document.getElementById('detailArt').src = song.cover || ''; document.getElementById('detailGenre').innerText = song.genre; document.getElementById('detailTitle').innerText = song.title; document.getElementById('detailUploader').innerText = song.uploader_name;
             document.getElementById('detailAvatar').innerHTML = song.uploader_avatar ? `<img src="${song.uploader_avatar}">` : '🎵';
             document.getElementById('detailDesc').innerText = song.description || 'No description provided.'; document.getElementById('detailPlays').innerText = (song.plays || 0) + ' plays';
+            
+            // Hide action buttons if guest
+            const actions = document.getElementById('detailActions');
+            if (userProfile.isGuest) {
+                actions.querySelectorAll('.detail-icon-btn').forEach(btn => btn.style.display = 'none');
+            } else {
+                actions.querySelectorAll('.detail-icon-btn').forEach(btn => btn.style.display = 'flex');
+            }
+
             fetchComments(songId); updatePlayerActionsUI();
         }
         async function fetchComments(songId) { const { data } = await sb.from('comments').select('*').eq('song_id', songId).order('created_at', { ascending: false }); const list = document.getElementById('commentsList'); list.innerHTML = ''; if (data && data.length > 0) { data.forEach(c => { list.innerHTML += `<div class="comment-item"><div class="avatar" style="width:40px;height:40px;border-radius:50%;overflow:hidden;">${c.avatar_url ? `<img src="${c.avatar_url}" style="width:100%;height:100%;object-fit:cover;">` : '🎵'}</div><div class="comment-content"><strong>${c.username}</strong><p>${c.comment_text}</p></div></div>`; }); } else { list.innerHTML = '<p style="color:var(--text-muted)">No comments yet. Be the first!</p>'; } }
@@ -508,8 +535,8 @@
             const grid = document.getElementById('profileViewGrid'); grid.innerHTML = '';
             userSongs.forEach(song => { const idx = mySongs.findIndex(s => s.id === song.id); const card = document.createElement('div'); card.className = 'song-card'; card.innerHTML = `<div class="song-art" onclick="openSongView('${song.id}')">${song.cover ? `<img src="${song.cover}">` : '🎵'}<div class="play-overlay" onclick="event.stopPropagation(); playSong(${idx})"><svg width="20" height="20" viewBox="0 0 24 24" fill="#000"><path d="M8 5v14l11-7z"/></svg></div></div><div class="song-title" onclick="openSongView('${song.id}')">${song.title}</div><div class="song-artist">${song.genre}</div>`; grid.appendChild(card); });
         }
-        async function toggleFollow(userId) { const { data: ex } = await sb.from('follows').select('id').eq('follower_id', userProfile.id).eq('followed_id', userId); if (ex && ex.length > 0) { await sb.from('follows').delete().eq('follower_id', userProfile.id).eq('followed_id', userId); } else { await sb.from('follows').insert([{ follower_id: userProfile.id, followed_id: userId }]); } openProfileView(userId); }
-        async function toggleBlock(userId) { const { data: ex } = await sb.from('blocks').select('id').eq('blocker_id', userProfile.id).eq('blocked_id', userId); if (ex && ex.length > 0) { await sb.from('blocks').delete().eq('blocker_id', userProfile.id).eq('blocked_id', userId); } else { await sb.from('blocks').insert([{ blocker_id: userProfile.id, blocked_id: userId }]); } openProfileView(userId); }
+        async function toggleFollow(userId) { if (userProfile.isGuest) return alert("Please sign in to follow users."); const { data: ex } = await sb.from('follows').select('id').eq('follower_id', userProfile.id).eq('followed_id', userId); if (ex && ex.length > 0) { await sb.from('follows').delete().eq('follower_id', userProfile.id).eq('followed_id', userId); } else { await sb.from('follows').insert([{ follower_id: userProfile.id, followed_id: userId }]); } openProfileView(userId); }
+        async function toggleBlock(userId) { if (userProfile.isGuest) return alert("Please sign in to block users."); const { data: ex } = await sb.from('blocks').select('id').eq('blocker_id', userProfile.id).eq('blocked_id', userId); if (ex && ex.length > 0) { await sb.from('blocks').delete().eq('blocker_id', userProfile.id).eq('blocked_id', userId); } else { await sb.from('blocks').insert([{ blocker_id: userProfile.id, blocked_id: userId }]); } openProfileView(userId); }
 
         function showView(view, el) { currentView = view; currentPlaylistId = null; document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.querySelectorAll('.playlist-item').forEach(n => n.classList.remove('active')); if (el) el.classList.add('active'); document.getElementById('listView').style.display = 'block'; document.getElementById('songDetailView').style.display = 'none'; document.getElementById('profileView').style.display = 'none'; document.getElementById('searchBarContainer').style.display = 'none'; document.getElementById('dropZone').style.display = 'none'; const title = document.getElementById('pageTitle'); if (view === 'search') { title.innerText = 'Search'; document.getElementById('searchBarContainer').style.display = 'block'; document.getElementById('searchInput').focus(); } else if (view === 'liked') { title.innerText = 'Liked Songs'; } else if (view === 'favorites') { title.innerText = 'Favorites'; } else { title.innerText = 'Your Library'; if (mySongs.length === 0) document.getElementById('dropZone').style.display = 'block'; } renderUI(); document.querySelector('.sidebar').classList.remove('open'); }
         function renderUI(searchQuery = '') {
@@ -531,7 +558,8 @@
             isPlaying = true; updatePlayPauseIcon(); updatePlayerActionsUI();
             document.getElementById('playerTitle').innerText = song.title; document.getElementById('playerArtist').innerText = song.uploader_name;
             const pa = document.getElementById('playerArt'); if (song.cover) { pa.innerHTML = `<img src="${song.cover}" onerror="this.parentElement.innerHTML='🎵'">`; pa.style.boxShadow = '0 0 25px rgba(0,212,255,0.5)'; } else { pa.innerHTML = '🎵'; pa.style.boxShadow = 'none'; }
-            sb.from('songs').update({ plays: (song.plays || 0) + 1 }).eq('id', song.id); song.plays = (song.plays || 0) + 1;
+            if(!userProfile.isGuest) { sb.from('songs').update({ plays: (song.plays || 0) + 1 }).eq('id', song.id); }
+            song.plays = (song.plays || 0) + 1;
             renderUI();
         }
         function playPause() { const ap = document.getElementById('audioPlayer'); if (currentSongIndex === -1 && mySongs.length > 0) { playSong(0); return; } if (isPlaying) { ap.pause(); isPlaying = false; } else { ap.play(); isPlaying = true; } updatePlayPauseIcon(); renderUI(); }
@@ -539,9 +567,9 @@
         function prevSong() { if (currentSongIndex > 0) playSong(currentSongIndex - 1); }
         function handleSongEnd() { if (isLooping) { document.getElementById('audioPlayer').currentTime = 0; document.getElementById('audioPlayer').play(); } else { nextSong(); } }
         function toggleLoop() { isLooping = !isLooping; document.getElementById('loopBtn').classList.toggle('loop-active', isLooping); }
-        async function toggleLike() { if (currentSongIndex === -1) return; const s = mySongs[currentSongIndex]; s.liked = !s.liked; if (s.liked) s.disliked = false; updatePlayerActionsUI(); await sb.from('songs').update({ liked: s.liked, disliked: false }).eq('id', s.id); }
-        async function toggleDislike() { if (currentSongIndex === -1) return; const s = mySongs[currentSongIndex]; s.disliked = !s.disliked; if (s.disliked) s.liked = false; updatePlayerActionsUI(); await sb.from('songs').update({ disliked: s.disliked, liked: false }).eq('id', s.id); }
-        async function toggleFavorite() { if (currentSongIndex === -1) return; const s = mySongs[currentSongIndex]; s.favorited = !s.favorited; updatePlayerActionsUI(); await sb.from('songs').update({ favorited: s.favorited }).eq('id', s.id); }
+        async function toggleLike() { if (userProfile.isGuest) return alert("Sign in to like songs!"); if (currentSongIndex === -1) return; const s = mySongs[currentSongIndex]; s.liked = !s.liked; if (s.liked) s.disliked = false; updatePlayerActionsUI(); await sb.from('songs').update({ liked: s.liked, disliked: false }).eq('id', s.id); }
+        async function toggleDislike() { if (userProfile.isGuest) return alert("Sign in to dislike songs!"); if (currentSongIndex === -1) return; const s = mySongs[currentSongIndex]; s.disliked = !s.disliked; if (s.disliked) s.liked = false; updatePlayerActionsUI(); await sb.from('songs').update({ disliked: s.disliked, liked: false }).eq('id', s.id); }
+        async function toggleFavorite() { if (userProfile.isGuest) return alert("Sign in to favorite songs!"); if (currentSongIndex === -1) return; const s = mySongs[currentSongIndex]; s.favorited = !s.favorited; updatePlayerActionsUI(); await sb.from('songs').update({ favorited: s.favorited }).eq('id', s.id); }
         function openShareModal() { if (currentSongIndex === -1) return; document.getElementById('shareLinkInput').value = window.location.href.split('?')[0] + "?track=" + mySongs[currentSongIndex].id; document.getElementById('shareModal').classList.add('active'); }
         function copyShareLink() { document.getElementById('shareLinkInput').select(); document.execCommand('copy'); alert("Copied!"); }
         function updatePlayerActionsUI() { if (currentSongIndex === -1) return; const s = mySongs[currentSongIndex]; document.getElementById('likeBtn').classList.toggle('active', s.liked); document.getElementById('dislikeBtn').classList.toggle('danger-active', s.disliked); document.getElementById('favBtn').classList.toggle('fav-active', s.favorited); if (currentSongDetailView && currentSongDetailView.id === s.id) { document.getElementById('detailLikeBtn').classList.toggle('active', s.liked); document.getElementById('detailDislikeBtn').classList.toggle('danger', s.disliked); document.getElementById('detailFavBtn').classList.toggle('fav-active', s.favorited); } }
