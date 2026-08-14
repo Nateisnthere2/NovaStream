@@ -45,7 +45,8 @@
         .playlist-item:hover { background: var(--glass); color: var(--text-main); }
         .playlist-item .trash-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; opacity: 0; transition: 0.2s; }
         .playlist-item:hover .trash-btn { opacity: 1; } .playlist-item .trash-btn:hover { color: var(--danger); }
-        .profile-area { margin-top: auto; display: flex; align-items: center; gap: 12px; padding: 15px; background: var(--glass); border-radius: 12px; }
+        .profile-area { margin-top: auto; display: flex; align-items: center; gap: 12px; padding: 15px; background: var(--glass); border-radius: 12px; cursor: pointer; transition: 0.2s; }
+        .profile-area:hover { background: rgba(255,255,255,0.1); }
         .avatar-upload { position: relative; cursor: pointer; }
         .avatar { width: 45px; height: 45px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; overflow: hidden; font-size: 18px; border: 2px solid var(--primary); }
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
@@ -54,7 +55,7 @@
         .profile-info { flex: 1; overflow: hidden; }
         .profile-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; display: flex; justify-content: space-between; }
         .profile-label span { cursor: pointer; color: var(--danger); }
-        .profile-name { color: var(--text-main); font-size: 14px; font-weight: 600; }
+        .profile-name { color: var(--text-main); font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .main-content { flex: 1; overflow-y: auto; padding: 40px; position: relative; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; gap: 20px; }
@@ -215,7 +216,7 @@
     <div class="app-container">
         <div class="sidebar">
             <div class="logo-container">
-                <svg width="40" height="40" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00d4ff"/><stop offset="1" stop-color="#005eff"/></linearGradient></defs><rect width="100" height="100" rx="25" fill="#0a0a0f" stroke="url(#g)" stroke-width="4"/><path d="M50 10 L54 46 L90 50 L54 54 L50 90 L46 54 L10 50 L46 46 Z" fill="url(#g)"/><path d="M25 35 Q 15 50 25 65" fill="none" stroke="url(#g)" stroke-width="5" stroke-linecap="round"/><path d="M75 35 Q 85 50 75 65" fill="none" stroke="url(#g)" stroke-width="5" stroke-linecap="round"/></svg>
+                <svg width="40" height="40" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00d4ff"/><stop offset="1" stop-color="#005eff"/></linearGradient></defs><rect width="100" height="100" rx="25" fill="#0a0a0f" stroke="url(#g)" stroke-width="4"/><path d="M50 10 L54 46 L90 50 L54 54 L50 90 L46 54 L10 50 L46 46 Z" fill="url(#g)"/><path d="M25 35 Q 15 50 25 65" fill="none" stroke="url(#g)" stroke-width="5" stroke-linecap="round"/><path d="M75 35 Q 85 50 75 65" fill='none' stroke='url(#g)' stroke-width='5' stroke-linecap='round'/></svg>
                 <div class="logo-text">NovaStream</div>
             </div>
             <div class="nav-item active" onclick="showView('library', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l18-12v24l-18-12z"/></svg>Your Library</div>
@@ -225,14 +226,14 @@
             <div class="nav-item" onclick="showCreatePlaylistModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Create Playlist</div>
             <div class="sidebar-divider"></div>
             <div id="playlistsList"></div>
-            <div class="profile-area">
-                <div class="avatar-upload" onclick="if(!userProfile.isGuest) document.getElementById('avatarInput').click()">
+            <div class="profile-area" onclick="if(userProfile) openProfileView(userProfile.id)">
+                <div class="avatar-upload" onclick="event.stopPropagation(); if(!userProfile.isGuest) document.getElementById('avatarInput').click()">
                     <div class="avatar" id="userAvatar">🎵</div>
                     <div class="avatar-overlay" id="avatarOverlay"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
                     <input type="file" id="avatarInput" accept="image/*" onchange="uploadAvatar(this)" style="display:none;">
                 </div>
                 <div class="profile-info">
-                    <div class="profile-label" id="profileLabel">Signed in as <span onclick="signOut()">Logout</span></div>
+                    <div class="profile-label" id="profileLabel">Signed in as <span onclick="event.stopPropagation(); signOut()">Logout</span></div>
                     <div class="profile-name" id="usernameDisplay">Loading...</div>
                 </div>
             </div>
@@ -345,6 +346,9 @@
     <div class="modal-overlay" id="shareModal"><div class="modal"><h2>Share Song</h2><p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">Copy the link below to send this song to a friend!</p><div style="display: flex; gap: 10px; margin-bottom: 20px;"><input type="text" id="shareLinkInput" style="flex: 1; padding: 12px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 10px; color: var(--text-main); outline: none;" readonly><button class="btn-primary" onclick="copyShareLink()">Copy</button></div><div class="modal-buttons"><button class="btn-secondary" onclick="document.getElementById('shareModal').classList.remove('active')">Close</button></div></div></div>
     <div class="modal-overlay" id="deleteModal"><div class="modal"><h2>Delete Song</h2><p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">Are you sure you want to permanently delete this song? This cannot be undone.</p><div class="modal-buttons"><button class="btn-secondary" onclick="document.getElementById('deleteModal').classList.remove('active')">Cancel</button><button class="btn-danger" id="confirmDeleteBtn">Delete</button></div></div></div>
     <div class="modal-overlay" id="queueModal"><div class="modal"><h2>Up Next</h2><div id="queueList" style="max-height: 400px; overflow-y: auto;"></div><div class="modal-buttons"><button class="btn-secondary" onclick="document.getElementById('queueModal').classList.remove('active')">Close</button></div></div></div>
+    
+    <!-- Edit Profile Modal -->
+    <div class="modal-overlay" id="editProfileModal"><div class="modal"><h2>Edit Profile</h2><label>Username (Can only change once every 7 days)</label><input type="text" id="editUsernameInput" placeholder="DJ Name"><label>Bio / Description</label><textarea id="editBioInput" rows="4" placeholder="Tell people about yourself..."></textarea><div class="modal-buttons"><button class="btn-secondary" onclick="document.getElementById('editProfileModal').classList.remove('active')">Cancel</button><button class="btn-primary" onclick="saveProfileChanges()">Save Changes</button></div></div></div>
 
     <audio id="audioPlayer" ontimeupdate="updateProgress()" onended="handleSongEnd()"></audio>
 
@@ -447,8 +451,8 @@
             const bio = document.getElementById('setupBio').value.trim();
             if (!username) return alert("Please choose a DJ Name.");
             
-            // FIX: Use upsert instead of insert. This will create the profile, OR update it if it already exists!
-            const { error } = await sb.from('users').upsert([{ id: session.user.id, username, bio }]);
+            // Use upsert instead of insert. This will create the profile, OR update it if it already exists!
+            const { error } = await sb.from('users').upsert([{ id: session.user.id, username, bio, last_username_change: new Date().toISOString() }]);
             if (error) {
                 console.error("Profile creation error:", error);
                 alert("Error creating profile: " + error.message);
@@ -466,11 +470,11 @@
 
             const profileLabel = document.getElementById('profileLabel');
             if (isGuest) {
-                profileLabel.innerHTML = 'Browsing as Guest <span onclick="signOut()" style="color:var(--primary);">Sign In</span>';
+                profileLabel.innerHTML = 'Browsing as Guest <span onclick="event.stopPropagation(); signOut()" style="color:var(--primary);">Sign In</span>';
                 document.getElementById('usernameDisplay').innerText = 'Guest';
                 document.getElementById('userAvatar').innerText = '👤';
             } else {
-                profileLabel.innerHTML = 'Signed in as <span onclick="signOut()">Logout</span>';
+                profileLabel.innerHTML = 'Signed in as <span onclick="event.stopPropagation(); signOut()">Logout</span>';
                 document.getElementById('usernameDisplay').innerText = userProfile.username;
                 const avatar = document.getElementById('userAvatar'); const cAvatar = document.getElementById('commentAvatar'); 
                 if (userProfile.avatar_url) { avatar.innerHTML = `<img src="${userProfile.avatar_url}">`; cAvatar.innerHTML = `<img src="${userProfile.avatar_url}">`; } else { avatar.innerHTML = '🎵'; cAvatar.innerHTML = '🎵'; }
@@ -499,7 +503,53 @@
                     const pubUrl = sb.storage.from('novastream').getPublicUrl(path).data.publicUrl;
                     await sb.from('users').update({ avatar_url: pubUrl }).eq('id', userProfile.id);
                     userProfile.avatar_url = pubUrl; enterApp();
+                    if (currentProfileViewId === userProfile.id) openProfileView(userProfile.id);
                 }
+            }
+        }
+
+        // --- Profile Editing ---
+        function openEditProfileModal() {
+            document.getElementById('editUsernameInput').value = userProfile.username;
+            document.getElementById('editBioInput').value = userProfile.bio || '';
+            document.getElementById('editProfileModal').classList.add('active');
+        }
+
+        async function saveProfileChanges() {
+            const newUsername = document.getElementById('editUsernameInput').value.trim();
+            const newBio = document.getElementById('editBioInput').value.trim();
+
+            if (!newUsername) return alert("Username cannot be empty.");
+
+            const updates = { bio: newBio };
+
+            // Check if username is changing
+            if (newUsername !== userProfile.username) {
+                const now = new Date();
+                const lastChange = userProfile.last_username_change ? new Date(userProfile.last_username_change) : new Date(0);
+                const oneWeek = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+                
+                if (now - lastChange < oneWeek) {
+                    const daysLeft = Math.ceil((oneWeek - (now - lastChange)) / (24 * 60 * 60 * 1000));
+                    alert(`You can only change your username once every 7 days. Please try again in ${daysLeft} day(s).`);
+                    return;
+                }
+
+                updates.username = newUsername;
+                updates.last_username_change = now.toISOString();
+            }
+
+            const { error } = await sb.from('users').update(updates).eq('id', userProfile.id);
+            if (error) {
+                alert("Error saving profile: " + error.message);
+            } else {
+                userProfile.username = updates.username || userProfile.username;
+                userProfile.bio = updates.bio;
+                userProfile.last_username_change = updates.last_username_change || userProfile.last_username_change;
+                
+                document.getElementById('editProfileModal').classList.remove('active');
+                enterApp(); // Refresh sidebar
+                openProfileView(userProfile.id); // Refresh profile view
             }
         }
 
@@ -561,7 +611,13 @@
             document.getElementById('profileViewAvatar').innerHTML = user.avatar_url ? `<img src="${user.avatar_url}">` : '🎵';
             const userSongs = mySongs.filter(s => s.uploader_id === userId); document.getElementById('profileViewStats').innerText = `${userSongs.length} Songs Uploaded`;
             const actionsDiv = document.getElementById('profileViewActions');
-            if (userId === userProfile.id) { actionsDiv.innerHTML = '<p style="color:var(--text-muted)">This is you!</p>'; } else { const { data: isFollowing } = await sb.from('follows').select('id').eq('follower_id', userProfile.id).eq('followed_id', userId); const { data: isBlocked } = await sb.from('blocks').select('id').eq('blocker_id', userProfile.id).eq('blocked_id', userId); actionsDiv.innerHTML = `<button class="follow-btn ${isFollowing.length > 0 ? 'following' : ''}" onclick="toggleFollow('${userId}')">${isFollowing.length > 0 ? 'Following' : 'Follow'}</button><button class="block-btn ${isBlocked.length > 0 ? 'blocked' : ''}" onclick="toggleBlock('${userId}')">${isBlocked.length > 0 ? 'Blocked' : 'Block'}</button>`; }
+            if (userId === userProfile.id) {
+                actionsDiv.innerHTML = `<button class="follow-btn" onclick="openEditProfileModal()">Edit Profile</button>`;
+            } else {
+                const { data: isFollowing } = await sb.from('follows').select('id').eq('follower_id', userProfile.id).eq('followed_id', userId); 
+                const { data: isBlocked } = await sb.from('blocks').select('id').eq('blocker_id', userProfile.id).eq('blocked_id', userId); 
+                actionsDiv.innerHTML = `<button class="follow-btn ${isFollowing.length > 0 ? 'following' : ''}" onclick="toggleFollow('${userId}')">${isFollowing.length > 0 ? 'Following' : 'Follow'}</button><button class="block-btn ${isBlocked.length > 0 ? 'blocked' : ''}" onclick="toggleBlock('${userId}')">${isBlocked.length > 0 ? 'Blocked' : 'Block'}</button>`;
+            }
             const grid = document.getElementById('profileViewGrid'); grid.innerHTML = '';
             userSongs.forEach(song => { const idx = mySongs.findIndex(s => s.id === song.id); const card = document.createElement('div'); card.className = 'song-card'; card.innerHTML = `<div class="song-art" onclick="openSongView('${song.id}')">${song.cover ? `<img src="${song.cover}">` : `<img src="${getDefaultCover(song.id)}">`}<div class="play-overlay" onclick="event.stopPropagation(); playSong(${idx})"><svg width="20" height="20" viewBox="0 0 24 24" fill="#000"><path d="M8 5v14l11-7z"/></svg></div></div><div class="song-title" onclick="openSongView('${song.id}')">${song.title}</div><div class="song-artist">${song.genre}</div>`; grid.appendChild(card); });
         }
@@ -672,7 +728,51 @@
         function showAddToPlaylistModal(songId) { const list = document.getElementById('playlistSelectList'); list.innerHTML = ''; if (myPlaylists.length === 0) { list.innerHTML = '<p style="color:var(--text-muted);text-align:center;">No playlists yet.</p>'; } else { myPlaylists.forEach(p => { const btn = document.createElement('button'); btn.className = 'btn-secondary'; btn.style.cssText = 'display:block;width:100%;margin-bottom:10px;text-align:left;'; btn.innerText = '+ ' + p.name; btn.onclick = () => { if (!p.songs.includes(songId)) { p.songs.push(songId); localStorage.setItem('novaPlaylists', JSON.stringify(myPlaylists)); } document.getElementById('addToPlaylistModal').classList.remove('active'); }; list.appendChild(btn); }); } document.getElementById('addToPlaylistModal').classList.add('active'); }
         function addCurrentToPlaylist() { if (currentSongIndex !== -1) showAddToPlaylistModal(mySongs[currentSongIndex].id); }
         function confirmDeleteSong(songId) { songToDelete = songId; document.getElementById('deleteModal').classList.add('active'); }
-        document.getElementById('confirmDeleteBtn').addEventListener('click', async function() { if (!songToDelete) return; const song = mySongs.find(s => s.id === songToDelete); if (!song) return; if (song.audio) { const p = song.audio.split('/novastream/')[1].split('?')[0]; if (p) await sb.storage.from('novastream').remove([decodeURIComponent(p)]); } if (song.cover) { const p = song.cover.split('/novastream/')[1].split('?')[0]; if (p) await sb.storage.from('novastream').remove([decodeURIComponent(p)]); } await sb.from('songs').delete().eq('id', songToDelete); if (mySongs[currentSongIndex] && mySongs[currentSongIndex].id === songToDelete) { document.getElementById('audioPlayer').pause(); document.getElementById('audioPlayer').src = ''; currentSongIndex = -1; isPlaying = false; updatePlayPauseIcon(); } document.getElementById('deleteModal').classList.remove('active'); songToDelete = null; });
+        
+        // Live Deletion Fix
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+            if (!songToDelete) return;
+            const song = mySongs.find(s => s.id === songToDelete);
+            if (!song) return;
+            
+            // 1. Delete from Storage
+            if (song.audio) {
+                const p = song.audio.split('/novastream/')[1].split('?')[0];
+                if (p) await sb.storage.from('novastream').remove([decodeURIComponent(p)]);
+            }
+            if (song.cover) {
+                const p = song.cover.split('/novastream/')[1].split('?')[0];
+                if (p) await sb.storage.from('novastream').remove([decodeURIComponent(p)]);
+            }
+            
+            // 2. Delete from Database
+            const { error } = await sb.from('songs').delete().eq('id', songToDelete);
+            if (error) return alert("Error deleting song: " + error.message);
+            
+            // 3. Live UI Update: Remove from local array immediately
+            mySongs = mySongs.filter(s => s.id !== songToDelete);
+            activeQueue = activeQueue.filter(id => id !== songToDelete); // Remove from queue too
+            
+            // 4. Handle player if the deleted song was playing
+            if (mySongs[currentSongIndex] && mySongs[currentSongIndex].id === songToDelete) {
+                document.getElementById('audioPlayer').pause();
+                document.getElementById('audioPlayer').src = '';
+                currentSongIndex = -1;
+                isPlaying = false;
+                updatePlayPauseIcon();
+                document.getElementById('playerTitle').innerText = 'Nothing Playing';
+                document.getElementById('playerArtist').innerText = 'Select a song';
+                document.getElementById('playerArt').innerText = '🎵';
+            }
+            
+            // 5. Close modal and refresh view
+            document.getElementById('deleteModal').classList.remove('active');
+            songToDelete = null;
+            
+            // Go back to list view and re-render
+            showView(currentView, document.querySelector('.nav-item.active'));
+            if (currentProfileViewId) openProfileView(currentProfileViewId); // Update profile grid if we are on it
+        });
     </script>
 </body>
 </html>
