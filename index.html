@@ -359,6 +359,11 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // Check if running locally (file://). Google login will NOT work.
+        if (window.location.protocol === 'file:') {
+            alert("WARNING: You are opening this file directly from your computer (file://). Google/Email login will NOT work! You must host it on GitHub Pages or use a Live Server for login to work.");
+        }
+
         const sb = supabase.createClient('https://dvkqmkohkyhujcrnjuug.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2a3Fta29oa3lodWpjcm5qdXVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0ODkxMDcsImV4cCI6MjEwMjA2NTEwN30.z_LYUlRygbjPdWnilB1zVA7pXXHJtd3ih-4qDDOMTMg');
         
         var session = null, userProfile = null;
@@ -383,9 +388,16 @@
             session = activeSession;
             if (!session) { document.getElementById('authScreen').style.display = 'flex'; } 
             else { await checkUserProfile(); }
+            
             sb.auth.onAuthStateChange(async (event, newSession) => {
-                if (event === 'SIGNED_IN' && newSession) { session = newSession; await checkUserProfile(); } 
-                else if (event === 'SIGNED_OUT') { session = null; userProfile = null; document.getElementById('authScreen').style.display = 'flex'; backToStep1(); }
+                if (event === 'SIGNED_IN' && newSession) {
+                    session = newSession;
+                    await checkUserProfile();
+                } else if (event === 'SIGNED_OUT') {
+                    session = null; userProfile = null;
+                    document.getElementById('authScreen').style.display = 'flex';
+                    backToStep1();
+                }
             });
         };
 
@@ -406,8 +418,12 @@
         }
 
         function continueAsGuest() { userProfile = { id: 'guest_' + Date.now(), username: 'Guest', isGuest: true }; enterApp(); }
-        async function signInWithGoogle() { await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } }); }
-        async function signInWithApple() { await sb.auth.signInWithOAuth({ provider: 'apple', options: { redirectTo: window.location.href } }); }
+        
+        async function signInWithGoogle() {
+            // Ensure redirect URL is clean (no query strings)
+            const redirectTo = window.location.origin + window.location.pathname;
+            await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: redirectTo } });
+        }
         
         async function handleEmailAuth() {
             const email = document.getElementById('authEmail').value;
@@ -436,9 +452,20 @@
         }
 
         async function checkUserProfile() {
-            const { data } = await sb.from('users').select('*').eq('id', session.user.id).single();
-            if (data) { userProfile = data; enterApp(); } 
-            else {
+            if (!session || !session.user) return;
+            const { data, error } = await sb.from('users').select('*').eq('id', session.user.id).single();
+            
+            if (error && error.code !== 'PGRST116') { 
+                console.error("Error fetching profile:", error);
+                alert("Error loading profile: " + error.message);
+                await sb.auth.signOut();
+                return;
+            }
+
+            if (data) {
+                userProfile = data;
+                enterApp();
+            } else {
                 document.getElementById('authScreen').style.display = 'flex';
                 document.getElementById('authStep1').style.display = 'none';
                 document.getElementById('authStep2').style.display = 'none';
