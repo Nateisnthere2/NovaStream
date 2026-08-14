@@ -422,8 +422,14 @@
             const username = document.getElementById('setupUsername').value.trim();
             const bio = document.getElementById('setupBio').value.trim();
             if (!username) return alert("Please choose a DJ Name.");
-            const { error } = await sb.from('users').insert([{ id: session.user.id, username, bio }]);
-            if (error) return alert("That username might be taken. Please choose another.");
+            
+            // FIX: Use upsert instead of insert. This will create the profile, OR update it if it already exists!
+            const { error } = await sb.from('users').upsert([{ id: session.user.id, username, bio }]);
+            if (error) {
+                console.error("Profile creation error:", error);
+                alert("Error creating profile: " + error.message);
+                return;
+            }
             await checkUserProfile(); 
         }
         function enterApp() {
