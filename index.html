@@ -213,6 +213,7 @@
                 <input type="text" class="auth-input" id="setupUsername" placeholder="Choose your DJ Name">
                 <textarea class="auth-input" id="setupBio" placeholder="Tell people about yourself (Bio)" rows="3" style="resize:none; height: auto;"></textarea>
                 <button class="auth-btn primary" onclick="completeProfile()">Finish Setup</button>
+                <button class="auth-btn guest" onclick="cancelSetup()">Cancel</button>
             </div>
         </div>
     </div>
@@ -276,7 +277,7 @@
                         <div class="detail-actions" id="detailActions">
                             <button class="detail-play-btn" onclick="playSong(currentSongDetailView.index)"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Play</button>
                             <button class="detail-icon-btn" id="detailLikeBtn" onclick="toggleLike()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-                            <button class="detail-icon-btn" id="detailDislikeBtn" onclick="toggleDislike()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/><path d="M12 5v3l-2 2l2 2l-2 2l2 2l-2 2l2 2"/></svg></button>
+                            <button class="detail-icon-btn" id="detailDislikeBtn" onclick="toggleDislike()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0,3.41.81,4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/><path d="M12 5v3l-2 2l2 2l-2 2l2 2l-2 2l2 2"/></svg></button>
                             <button class="detail-icon-btn" id="detailFavBtn" onclick="toggleFavorite()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
                             <button class="detail-icon-btn" onclick="addCurrentToPlaylist()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
                             <button class="detail-icon-btn" onclick="openShareModal()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
@@ -335,7 +336,7 @@
         </div>
         <div class="player-actions-right" id="playerActionsRight">
             <button class="action-btn" id="likeBtn" onclick="toggleLike()" title="Like"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-            <button class="action-btn" id="dislikeBtn" onclick="toggleDislike()" title="Dislike"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/><path d="M12 5v3l-2 2l2 2l-2 2l2 2l-2 2l2 2"/></svg></button>
+            <button class="action-btn" id="dislikeBtn" onclick="toggleDislike()" title="Dislike"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0,3.41.81,4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/><path d="M12 5v3l-2 2l2 2l-2 2l2 2l-2 2l2 2"/></svg></button>
             <button class="action-btn" id="favBtn" onclick="toggleFavorite()" title="Favorite"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
             <button class="action-btn" onclick="openQueueModal()" title="Queue"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
             <div class="volume-wrapper">
@@ -366,42 +367,25 @@
         var isPlaying = false, isLooping = false, isShuffled = false;
         var activeQueue = [], activeQueueIndex = -1;
         var tempAudioFile = null, tempAudioHash = null, tempCoverFile = null, tempPlaylistCoverFile = null, selectedGenre = null, songToDelete = null;
-        var authMode = 'signup'; // 'signup' or 'login'
+        var authMode = 'signup'; 
 
-        // --- Dynamic Default Cover Generator ---
         function getDefaultCover(seed) {
             let hash = 0;
-            for (let i = 0; i < seed.length; i++) {
-                hash = seed.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            const colors = [
-                ['#00d4ff', '#005eff'], ['#834d9b', '#d04ed6'], ['#11998e', '#38ef7d'],
-                ['#e65c00', '#f9d423'], ['#b21f1f', '#fdbb2d'], ['#2c3e50', '#4a1a40']
-            ];
+            for (let i = 0; i < seed.length; i++) { hash = seed.charCodeAt(i) + ((hash << 5) - hash); }
+            const colors = [['#00d4ff', '#005eff'], ['#834d9b', '#d04ed6'], ['#11998e', '#38ef7d'], ['#e65c00', '#f9d423'], ['#b21f1f', '#fdbb2d'], ['#2c3e50', '#4a1a40']];
             const chosen = colors[Math.abs(hash) % colors.length];
             const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='${chosen[0]}'/><stop offset='1' stop-color='${chosen[1]}'/></linearGradient></defs><rect width='100' height='100' fill='url(#g)'/><path d='M50 20 L54 46 L80 50 L54 54 L50 80 L46 54 L20 50 L46 46 Z' fill='rgba(255,255,255,0.2)'/><path d='M30 65 Q 20 50 30 35' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='4' stroke-linecap='round'/><path d='M70 65 Q 80 50 70 35' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='4' stroke-linecap='round'/></svg>`;
             return 'data:image/svg+xml,' + encodeURIComponent(svg);
         }
 
-        // --- AUTHENTICATION FLOW ---
         window.onload = async function() {
             const { data: { session: activeSession } } = await sb.auth.getSession();
             session = activeSession;
-            
-            if (!session) {
-                document.getElementById('authScreen').style.display = 'flex';
-            } else {
-                await checkUserProfile();
-            }
+            if (!session) { document.getElementById('authScreen').style.display = 'flex'; } 
+            else { await checkUserProfile(); }
             sb.auth.onAuthStateChange(async (event, newSession) => {
-                if (event === 'SIGNED_IN' && newSession) {
-                    session = newSession;
-                    await checkUserProfile();
-                } else if (event === 'SIGNED_OUT') {
-                    session = null; userProfile = null;
-                    document.getElementById('authScreen').style.display = 'flex';
-                    backToStep1();
-                }
+                if (event === 'SIGNED_IN' && newSession) { session = newSession; await checkUserProfile(); } 
+                else if (event === 'SIGNED_OUT') { session = null; userProfile = null; document.getElementById('authScreen').style.display = 'flex'; backToStep1(); }
             });
         };
 
@@ -417,48 +401,25 @@
             const prompt = document.getElementById('togglePrompt');
             const link = document.getElementById('toggleLink');
             const subtitle = document.getElementById('authSubtitle');
-
-            if (authMode === 'login') {
-                btn.innerText = 'Log in with Email';
-                prompt.innerText = "Don't have an account?";
-                link.innerText = 'Sign up';
-                subtitle.innerText = 'Welcome back! Log in to continue streaming.';
-            } else {
-                btn.innerText = 'Continue with Email';
-                prompt.innerText = 'Already have an account?';
-                link.innerText = 'Log in';
-                subtitle.innerText = 'Sign in or create an account to start streaming.';
-            }
+            if (authMode === 'login') { btn.innerText = 'Log in with Email'; prompt.innerText = "Don't have an account?"; link.innerText = 'Sign up'; subtitle.innerText = 'Welcome back! Log in to continue streaming.'; } 
+            else { btn.innerText = 'Continue with Email'; prompt.innerText = 'Already have an account?'; link.innerText = 'Log in'; subtitle.innerText = 'Sign in or create an account to start streaming.'; }
         }
 
-        function continueAsGuest() {
-            userProfile = { id: 'guest_' + Date.now(), username: 'Guest', isGuest: true };
-            enterApp();
-        }
-
-        async function signInWithGoogle() {
-            await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
-        }
-        async function signInWithApple() {
-            await sb.auth.signInWithOAuth({ provider: 'apple', options: { redirectTo: window.location.href } });
-        }
+        function continueAsGuest() { userProfile = { id: 'guest_' + Date.now(), username: 'Guest', isGuest: true }; enterApp(); }
+        async function signInWithGoogle() { await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } }); }
+        async function signInWithApple() { await sb.auth.signInWithOAuth({ provider: 'apple', options: { redirectTo: window.location.href } }); }
         
         async function handleEmailAuth() {
             const email = document.getElementById('authEmail').value;
             const password = document.getElementById('authPassword').value;
             if (!email || !password) return alert("Enter email and password.");
-
             if (authMode === 'signup') {
                 const { data, error } = await sb.auth.signUp({ email, password });
                 if (error) return alert(error.message);
-                if (data.user && !data.session) {
-                    document.getElementById('authStep1').style.display = 'none';
-                    document.getElementById('authStep2').style.display = 'block';
-                }
+                if (data.user && !data.session) { document.getElementById('authStep1').style.display = 'none'; document.getElementById('authStep2').style.display = 'block'; }
             } else if (authMode === 'login') {
                 const { data, error } = await sb.auth.signInWithPassword({ email, password });
                 if (error) return alert(error.message);
-                // onAuthStateChange will handle entering the app
             }
         }
 
@@ -469,12 +430,15 @@
             if (error) return alert("Invalid code. Try again.");
         }
         
+        async function cancelSetup() {
+            await sb.auth.signOut();
+            backToStep1();
+        }
+
         async function checkUserProfile() {
             const { data } = await sb.from('users').select('*').eq('id', session.user.id).single();
-            if (data) {
-                userProfile = data;
-                enterApp();
-            } else {
+            if (data) { userProfile = data; enterApp(); } 
+            else {
                 document.getElementById('authScreen').style.display = 'flex';
                 document.getElementById('authStep1').style.display = 'none';
                 document.getElementById('authStep2').style.display = 'none';
@@ -486,24 +450,17 @@
             const username = document.getElementById('setupUsername').value.trim();
             const bio = document.getElementById('setupBio').value.trim();
             if (!username) return alert("Please choose a DJ Name.");
-            
             const { error } = await sb.from('users').upsert([{ id: session.user.id, username, bio, last_username_change: new Date().toISOString() }]);
-            if (error) {
-                console.error("Profile creation error:", error);
-                alert("Error creating profile: " + error.message);
-                return;
-            }
+            if (error) { console.error("Profile creation error:", error); alert("Error creating profile: " + error.message); return; }
             await checkUserProfile(); 
         }
         
         function enterApp() {
             document.getElementById('authScreen').style.display = 'none';
-            
             const isGuest = userProfile.isGuest;
             document.getElementById('uploadBtn').style.display = isGuest ? 'none' : 'flex';
             document.getElementById('commentInputArea').style.display = isGuest ? 'none' : 'flex';
             document.getElementById('avatarOverlay').style.display = isGuest ? 'none' : 'flex';
-
             const profileLabel = document.getElementById('profileLabel');
             if (isGuest) {
                 profileLabel.innerHTML = 'Browsing as Guest <span onclick="event.stopPropagation(); signOut()" style="color:var(--primary);">Sign In</span>';
@@ -515,7 +472,6 @@
                 const avatar = document.getElementById('userAvatar'); const cAvatar = document.getElementById('commentAvatar'); 
                 if (userProfile.avatar_url) { avatar.innerHTML = `<img src="${userProfile.avatar_url}">`; cAvatar.innerHTML = `<img src="${userProfile.avatar_url}">`; } else { avatar.innerHTML = '🎵'; cAvatar.innerHTML = '🎵'; }
             }
-
             renderPlaylists(); loadSongs();
             sb.channel('public:songs').on('postgres_changes', { event: '*', schema: 'public', table: 'songs' }, loadSongs).subscribe();
             sb.channel('public:comments').on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, payload => { if (currentSongDetailView) fetchComments(currentSongDetailView.id); }).subscribe();
@@ -523,13 +479,8 @@
         }
         
         async function signOut() {
-            if (userProfile.isGuest) {
-                userProfile = null;
-                document.getElementById('authScreen').style.display = 'flex';
-                backToStep1();
-            } else {
-                await sb.auth.signOut();
-            }
+            if (userProfile.isGuest) { userProfile = null; document.getElementById('authScreen').style.display = 'flex'; backToStep1(); } 
+            else { await sb.auth.signOut(); }
         }
 
         async function uploadAvatar(input) {
@@ -545,7 +496,6 @@
             }
         }
 
-        // --- Profile Editing ---
         function openEditProfileModal() {
             document.getElementById('editUsernameInput').value = userProfile.username;
             document.getElementById('editBioInput').value = userProfile.bio || '';
@@ -555,34 +505,26 @@
         async function saveProfileChanges() {
             const newUsername = document.getElementById('editUsernameInput').value.trim();
             const newBio = document.getElementById('editBioInput').value.trim();
-
             if (!newUsername) return alert("Username cannot be empty.");
-
             const updates = { bio: newBio };
-
             if (newUsername !== userProfile.username) {
                 const now = new Date();
                 const lastChange = userProfile.last_username_change ? new Date(userProfile.last_username_change) : new Date(0);
                 const oneWeek = 7 * 24 * 60 * 60 * 1000; 
-                
                 if (now - lastChange < oneWeek) {
                     const daysLeft = Math.ceil((oneWeek - (now - lastChange)) / (24 * 60 * 60 * 1000));
                     alert(`You can only change your username once every 7 days. Please try again in ${daysLeft} day(s).`);
                     return;
                 }
-
                 updates.username = newUsername;
                 updates.last_username_change = now.toISOString();
             }
-
             const { error } = await sb.from('users').update(updates).eq('id', userProfile.id);
-            if (error) {
-                alert("Error saving profile: " + error.message);
-            } else {
+            if (error) { alert("Error saving profile: " + error.message); } 
+            else {
                 userProfile.username = updates.username || userProfile.username;
                 userProfile.bio = updates.bio;
                 userProfile.last_username_change = updates.last_username_change || userProfile.last_username_change;
-                
                 document.getElementById('editProfileModal').classList.remove('active');
                 enterApp(); 
                 openProfileView(userProfile.id); 
@@ -624,14 +566,9 @@
             document.getElementById('detailArt').src = song.cover || getDefaultCover(song.id); document.getElementById('detailGenre').innerText = song.genre; document.getElementById('detailTitle').innerText = song.title; document.getElementById('detailUploader').innerText = song.uploader_name;
             document.getElementById('detailAvatar').innerHTML = song.uploader_avatar ? `<img src="${song.uploader_avatar}">` : '🎵';
             document.getElementById('detailDesc').innerText = song.description || 'No description provided.'; document.getElementById('detailPlays').innerText = (song.plays || 0) + ' plays';
-            
             const actions = document.getElementById('detailActions');
-            if (userProfile.isGuest) {
-                actions.querySelectorAll('.detail-icon-btn').forEach(btn => btn.style.display = 'none');
-            } else {
-                actions.querySelectorAll('.detail-icon-btn').forEach(btn => btn.style.display = 'flex');
-            }
-
+            if (userProfile.isGuest) { actions.querySelectorAll('.detail-icon-btn').forEach(btn => btn.style.display = 'none'); } 
+            else { actions.querySelectorAll('.detail-icon-btn').forEach(btn => btn.style.display = 'flex'); }
             fetchComments(songId); updatePlayerActionsUI();
         }
         async function fetchComments(songId) { const { data } = await sb.from('comments').select('*').eq('song_id', songId).order('created_at', { ascending: false }); const list = document.getElementById('commentsList'); list.innerHTML = ''; if (data && data.length > 0) { data.forEach(c => { list.innerHTML += `<div class="comment-item"><div class="avatar" style="width:40px;height:40px;border-radius:50%;overflow:hidden;">${c.avatar_url ? `<img src="${c.avatar_url}" style="width:100%;height:100%;object-fit:cover;">` : '🎵'}</div><div class="comment-content"><strong>${c.username}</strong><p>${c.comment_text}</p></div></div>`; }); } else { list.innerHTML = '<p style="color:var(--text-muted)">No comments yet. Be the first!</p>'; } }
@@ -646,9 +583,8 @@
             document.getElementById('profileViewAvatar').innerHTML = user.avatar_url ? `<img src="${user.avatar_url}">` : '🎵';
             const userSongs = mySongs.filter(s => s.uploader_id === userId); document.getElementById('profileViewStats').innerText = `${userSongs.length} Songs Uploaded`;
             const actionsDiv = document.getElementById('profileViewActions');
-            if (userId === userProfile.id) {
-                actionsDiv.innerHTML = `<button class="follow-btn" onclick="openEditProfileModal()">Edit Profile</button>`;
-            } else {
+            if (userId === userProfile.id) { actionsDiv.innerHTML = `<button class="follow-btn" onclick="openEditProfileModal()">Edit Profile</button>`; } 
+            else {
                 const { data: isFollowing } = await sb.from('follows').select('id').eq('follower_id', userProfile.id).eq('followed_id', userId); 
                 const { data: isBlocked } = await sb.from('blocks').select('id').eq('blocker_id', userProfile.id).eq('blocked_id', userId); 
                 actionsDiv.innerHTML = `<button class="follow-btn ${isFollowing.length > 0 ? 'following' : ''}" onclick="toggleFollow('${userId}')">${isFollowing.length > 0 ? 'Following' : 'Follow'}</button><button class="block-btn ${isBlocked.length > 0 ? 'blocked' : ''}" onclick="toggleBlock('${userId}')">${isBlocked.length > 0 ? 'Blocked' : 'Block'}</button>`;
@@ -683,7 +619,6 @@
             else { pa.innerHTML = `<img src="${getDefaultCover(song.id)}">`; pa.style.boxShadow = 'none'; }
             if(!userProfile.isGuest) { sb.from('songs').update({ plays: (song.plays || 0) + 1 }).eq('id', song.id); }
             song.plays = (song.plays || 0) + 1;
-
             let contextSongs = []; 
             if (currentView === 'playlist') { const p = myPlaylists.find(p => p.id == currentPlaylistId); if (p) contextSongs = mySongs.filter(s => p.songs.includes(s.id)); } 
             else if (currentView === 'search') { const searchQuery = document.getElementById('searchInput').value.toLowerCase(); contextSongs = mySongs.filter(s => s.title.toLowerCase().includes(searchQuery) || s.genre.toLowerCase().includes(searchQuery)); } 
@@ -692,53 +627,31 @@
             else { contextSongs = mySongs; }
             activeQueue = contextSongs.map(s => s.id); 
             activeQueueIndex = activeQueue.indexOf(song.id);
-
             renderUI();
         }
         function playPause() { const ap = document.getElementById('audioPlayer'); if (currentSongIndex === -1 && mySongs.length > 0) { playSong(0); return; } if (isPlaying) { ap.pause(); isPlaying = false; } else { ap.play(); isPlaying = true; } updatePlayPauseIcon(); renderUI(); }
         function nextSong() { 
             if (activeQueue.length === 0) { if (currentSongIndex < mySongs.length - 1) playSong(currentSongIndex + 1); return; }
-            if (isShuffled) {
-                let randIndex = activeQueueIndex;
-                while (randIndex === activeQueueIndex && activeQueue.length > 1) {
-                    randIndex = Math.floor(Math.random() * activeQueue.length);
-                }
-                activeQueueIndex = randIndex;
-            } else {
-                activeQueueIndex++;
-                if (activeQueueIndex >= activeQueue.length) activeQueueIndex = 0;
-            }
-            const nextSongId = activeQueue[activeQueueIndex];
-            const nextIdx = mySongs.findIndex(s => s.id === nextSongId);
-            playSong(nextIdx);
+            if (isShuffled) { let randIndex = activeQueueIndex; while (randIndex === activeQueueIndex && activeQueue.length > 1) { randIndex = Math.floor(Math.random() * activeQueue.length); } activeQueueIndex = randIndex; } 
+            else { activeQueueIndex++; if (activeQueueIndex >= activeQueue.length) activeQueueIndex = 0; }
+            const nextSongId = activeQueue[activeQueueIndex]; const nextIdx = mySongs.findIndex(s => s.id === nextSongId); playSong(nextIdx);
         }
         function prevSong() { 
             if (activeQueue.length === 0) { if (currentSongIndex > 0) playSong(currentSongIndex - 1); return; }
-            activeQueueIndex--; 
-            if (activeQueueIndex < 0) activeQueueIndex = activeQueue.length - 1;
-            const prevSongId = activeQueue[activeQueueIndex];
-            const prevIdx = mySongs.findIndex(s => s.id === prevSongId);
-            playSong(prevIdx);
+            activeQueueIndex--; if (activeQueueIndex < 0) activeQueueIndex = activeQueue.length - 1;
+            const prevSongId = activeQueue[activeQueueIndex]; const prevIdx = mySongs.findIndex(s => s.id === prevSongId); playSong(prevIdx);
         }
         function handleSongEnd() { if (isLooping) { document.getElementById('audioPlayer').currentTime = 0; document.getElementById('audioPlayer').play(); } else { nextSong(); } }
         function toggleLoop() { isLooping = !isLooping; document.getElementById('loopBtn').classList.toggle('loop-active', isLooping); }
         function toggleShuffle() { isShuffled = !isShuffled; document.getElementById('shuffleBtn').classList.toggle('shuffle-active', isShuffled); }
         function openQueueModal() {
-            const list = document.getElementById('queueList');
-            list.innerHTML = '';
-            if (activeQueue.length === 0) {
-                list.innerHTML = '<p style="color:var(--text-muted)">Queue is empty.</p>';
-            } else {
+            const list = document.getElementById('queueList'); list.innerHTML = '';
+            if (activeQueue.length === 0) { list.innerHTML = '<p style="color:var(--text-muted)">Queue is empty.</p>'; } 
+            else {
                 activeQueue.forEach((id, i) => {
                     const s = mySongs.find(x => x.id === id);
                     if (s) {
-                        list.innerHTML += `<div class="queue-item ${i === activeQueueIndex ? 'playing' : ''}" onclick="playSong(mySongs.findIndex(x => x.id === '${id}')); document.getElementById('queueModal').classList.remove('active');">
-                            <img src="${s.cover || getDefaultCover(s.id)}" onerror="this.onerror=null;this.src='${getDefaultCover(s.id)}'">
-                            <div>
-                                <div style="font-weight:600;">${s.title}</div>
-                                <div style="font-size:12px;color:var(--text-muted)">${s.uploader_name}</div>
-                            </div>
-                        </div>`;
+                        list.innerHTML += `<div class="queue-item ${i === activeQueueIndex ? 'playing' : ''}" onclick="playSong(mySongs.findIndex(x => x.id === '${id}')); document.getElementById('queueModal').classList.remove('active');"><img src="${s.cover || getDefaultCover(s.id)}" onerror="this.onerror=null;this.src='${getDefaultCover(s.id)}'"><div><div style="font-weight:600;">${s.title}</div><div style="font-size:12px;color:var(--text-muted)">${s.uploader_name}</div></div></div>`;
                     }
                 });
             }
@@ -767,36 +680,17 @@
             if (!songToDelete) return;
             const song = mySongs.find(s => s.id === songToDelete);
             if (!song) return;
-            
-            if (song.audio) {
-                const p = song.audio.split('/novastream/')[1].split('?')[0];
-                if (p) await sb.storage.from('novastream').remove([decodeURIComponent(p)]);
-            }
-            if (song.cover) {
-                const p = song.cover.split('/novastream/')[1].split('?')[0];
-                if (p) await sb.storage.from('novastream').remove([decodeURIComponent(p)]);
-            }
-            
+            if (song.audio) { const p = song.audio.split('/novastream/')[1].split('?')[0]; if (p) await sb.storage.from('novastream').remove([decodeURIComponent(p)]); }
+            if (song.cover) { const p = song.cover.split('/novastream/')[1].split('?')[0]; if (p) await sb.storage.from('novastream').remove([decodeURIComponent(p)]); }
             const { error } = await sb.from('songs').delete().eq('id', songToDelete);
             if (error) return alert("Error deleting song: " + error.message);
-            
             mySongs = mySongs.filter(s => s.id !== songToDelete);
             activeQueue = activeQueue.filter(id => id !== songToDelete); 
-            
             if (mySongs[currentSongIndex] && mySongs[currentSongIndex].id === songToDelete) {
-                document.getElementById('audioPlayer').pause();
-                document.getElementById('audioPlayer').src = '';
-                currentSongIndex = -1;
-                isPlaying = false;
-                updatePlayPauseIcon();
-                document.getElementById('playerTitle').innerText = 'Nothing Playing';
-                document.getElementById('playerArtist').innerText = 'Select a song';
-                document.getElementById('playerArt').innerText = '🎵';
+                document.getElementById('audioPlayer').pause(); document.getElementById('audioPlayer').src = ''; currentSongIndex = -1; isPlaying = false; updatePlayPauseIcon();
+                document.getElementById('playerTitle').innerText = 'Nothing Playing'; document.getElementById('playerArtist').innerText = 'Select a song'; document.getElementById('playerArt').innerText = '🎵';
             }
-            
-            document.getElementById('deleteModal').classList.remove('active');
-            songToDelete = null;
-            
+            document.getElementById('deleteModal').classList.remove('active'); songToDelete = null;
             showView(currentView, document.querySelector('.nav-item.active'));
             if (currentProfileViewId) openProfileView(currentProfileViewId); 
         });
