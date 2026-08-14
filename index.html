@@ -30,6 +30,8 @@
         .auth-input:focus { border-color: var(--primary); }
         .auth-divider { display: flex; align-items: center; gap: 10px; margin: 20px 0; color: var(--text-muted); font-size: 12px; }
         .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--glass-border); }
+        .auth-toggle { margin-top: 15px; font-size: 12px; color: var(--text-muted); }
+        .auth-toggle span { color: var(--primary); cursor: pointer; text-decoration: underline; }
 
         .app-container { display: flex; flex: 1; overflow: hidden; }
         .hamburger { display: none; background: none; border: none; color: var(--text-main); cursor: pointer; position: absolute; top: 40px; left: 20px; z-index: 20; }
@@ -191,8 +193,12 @@
                 <div class="auth-divider">OR</div>
                 <input type="email" class="auth-input" id="authEmail" placeholder="Email Address">
                 <input type="password" class="auth-input" id="authPassword" placeholder="Password">
-                <button class="auth-btn primary" onclick="signUpWithEmail()">Continue with Email</button>
+                <button class="auth-btn primary" id="emailAuthBtn" onclick="handleEmailAuth()">Continue with Email</button>
                 <button class="auth-btn guest" onclick="continueAsGuest()">Continue as Guest</button>
+                <div class="auth-toggle">
+                    <span id="togglePrompt">Already have an account?</span> 
+                    <span id="toggleLink" onclick="toggleAuthMode()">Log in</span>
+                </div>
             </div>
 
             <div id="authStep2" style="display:none;">
@@ -346,8 +352,6 @@
     <div class="modal-overlay" id="shareModal"><div class="modal"><h2>Share Song</h2><p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">Copy the link below to send this song to a friend!</p><div style="display: flex; gap: 10px; margin-bottom: 20px;"><input type="text" id="shareLinkInput" style="flex: 1; padding: 12px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 10px; color: var(--text-main); outline: none;" readonly><button class="btn-primary" onclick="copyShareLink()">Copy</button></div><div class="modal-buttons"><button class="btn-secondary" onclick="document.getElementById('shareModal').classList.remove('active')">Close</button></div></div></div>
     <div class="modal-overlay" id="deleteModal"><div class="modal"><h2>Delete Song</h2><p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">Are you sure you want to permanently delete this song? This cannot be undone.</p><div class="modal-buttons"><button class="btn-secondary" onclick="document.getElementById('deleteModal').classList.remove('active')">Cancel</button><button class="btn-danger" id="confirmDeleteBtn">Delete</button></div></div></div>
     <div class="modal-overlay" id="queueModal"><div class="modal"><h2>Up Next</h2><div id="queueList" style="max-height: 400px; overflow-y: auto;"></div><div class="modal-buttons"><button class="btn-secondary" onclick="document.getElementById('queueModal').classList.remove('active')">Close</button></div></div></div>
-    
-    <!-- Edit Profile Modal -->
     <div class="modal-overlay" id="editProfileModal"><div class="modal"><h2>Edit Profile</h2><label>Username (Can only change once every 7 days)</label><input type="text" id="editUsernameInput" placeholder="DJ Name"><label>Bio / Description</label><textarea id="editBioInput" rows="4" placeholder="Tell people about yourself..."></textarea><div class="modal-buttons"><button class="btn-secondary" onclick="document.getElementById('editProfileModal').classList.remove('active')">Cancel</button><button class="btn-primary" onclick="saveProfileChanges()">Save Changes</button></div></div></div>
 
     <audio id="audioPlayer" ontimeupdate="updateProgress()" onended="handleSongEnd()"></audio>
@@ -362,6 +366,7 @@
         var isPlaying = false, isLooping = false, isShuffled = false;
         var activeQueue = [], activeQueueIndex = -1;
         var tempAudioFile = null, tempAudioHash = null, tempCoverFile = null, tempPlaylistCoverFile = null, selectedGenre = null, songToDelete = null;
+        var authMode = 'signup'; // 'signup' or 'login'
 
         // --- Dynamic Default Cover Generator ---
         function getDefaultCover(seed) {
@@ -406,6 +411,26 @@
             document.getElementById('authStep3').style.display = 'none';
         }
 
+        function toggleAuthMode() {
+            authMode = authMode === 'signup' ? 'login' : 'signup';
+            const btn = document.getElementById('emailAuthBtn');
+            const prompt = document.getElementById('togglePrompt');
+            const link = document.getElementById('toggleLink');
+            const subtitle = document.getElementById('authSubtitle');
+
+            if (authMode === 'login') {
+                btn.innerText = 'Log in with Email';
+                prompt.innerText = "Don't have an account?";
+                link.innerText = 'Sign up';
+                subtitle.innerText = 'Welcome back! Log in to continue streaming.';
+            } else {
+                btn.innerText = 'Continue with Email';
+                prompt.innerText = 'Already have an account?';
+                link.innerText = 'Log in';
+                subtitle.innerText = 'Sign in or create an account to start streaming.';
+            }
+        }
+
         function continueAsGuest() {
             userProfile = { id: 'guest_' + Date.now(), username: 'Guest', isGuest: true };
             enterApp();
@@ -417,23 +442,33 @@
         async function signInWithApple() {
             await sb.auth.signInWithOAuth({ provider: 'apple', options: { redirectTo: window.location.href } });
         }
-        async function signUpWithEmail() {
+        
+        async function handleEmailAuth() {
             const email = document.getElementById('authEmail').value;
             const password = document.getElementById('authPassword').value;
             if (!email || !password) return alert("Enter email and password.");
-            const { data, error } = await sb.auth.signUp({ email, password });
-            if (error) return alert(error.message);
-            if (data.user && !data.session) {
-                document.getElementById('authStep1').style.display = 'none';
-                document.getElementById('authStep2').style.display = 'block';
+
+            if (authMode === 'signup') {
+                const { data, error } = await sb.auth.signUp({ email, password });
+                if (error) return alert(error.message);
+                if (data.user && !data.session) {
+                    document.getElementById('authStep1').style.display = 'none';
+                    document.getElementById('authStep2').style.display = 'block';
+                }
+            } else if (authMode === 'login') {
+                const { data, error } = await sb.auth.signInWithPassword({ email, password });
+                if (error) return alert(error.message);
+                // onAuthStateChange will handle entering the app
             }
         }
+
         async function verifyOtp() {
             const email = document.getElementById('authEmail').value;
             const token = document.getElementById('authOtp').value;
             const { error } = await sb.auth.verifyOtp({ email, token, type: 'signup' });
             if (error) return alert("Invalid code. Try again.");
         }
+        
         async function checkUserProfile() {
             const { data } = await sb.from('users').select('*').eq('id', session.user.id).single();
             if (data) {
@@ -446,12 +481,12 @@
                 document.getElementById('authStep3').style.display = 'block';
             }
         }
+        
         async function completeProfile() {
             const username = document.getElementById('setupUsername').value.trim();
             const bio = document.getElementById('setupBio').value.trim();
             if (!username) return alert("Please choose a DJ Name.");
             
-            // Use upsert instead of insert. This will create the profile, OR update it if it already exists!
             const { error } = await sb.from('users').upsert([{ id: session.user.id, username, bio, last_username_change: new Date().toISOString() }]);
             if (error) {
                 console.error("Profile creation error:", error);
@@ -460,6 +495,7 @@
             }
             await checkUserProfile(); 
         }
+        
         function enterApp() {
             document.getElementById('authScreen').style.display = 'none';
             
@@ -485,6 +521,7 @@
             sb.channel('public:comments').on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, payload => { if (currentSongDetailView) fetchComments(currentSongDetailView.id); }).subscribe();
             const urlParams = new URLSearchParams(window.location.search); const trackId = urlParams.get('track'); if (trackId) { const idx = mySongs.findIndex(s => s.id === trackId); if (idx !== -1) playSong(idx); }
         }
+        
         async function signOut() {
             if (userProfile.isGuest) {
                 userProfile = null;
@@ -523,11 +560,10 @@
 
             const updates = { bio: newBio };
 
-            // Check if username is changing
             if (newUsername !== userProfile.username) {
                 const now = new Date();
                 const lastChange = userProfile.last_username_change ? new Date(userProfile.last_username_change) : new Date(0);
-                const oneWeek = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+                const oneWeek = 7 * 24 * 60 * 60 * 1000; 
                 
                 if (now - lastChange < oneWeek) {
                     const daysLeft = Math.ceil((oneWeek - (now - lastChange)) / (24 * 60 * 60 * 1000));
@@ -548,8 +584,8 @@
                 userProfile.last_username_change = updates.last_username_change || userProfile.last_username_change;
                 
                 document.getElementById('editProfileModal').classList.remove('active');
-                enterApp(); // Refresh sidebar
-                openProfileView(userProfile.id); // Refresh profile view
+                enterApp(); 
+                openProfileView(userProfile.id); 
             }
         }
 
@@ -589,7 +625,6 @@
             document.getElementById('detailAvatar').innerHTML = song.uploader_avatar ? `<img src="${song.uploader_avatar}">` : '🎵';
             document.getElementById('detailDesc').innerText = song.description || 'No description provided.'; document.getElementById('detailPlays').innerText = (song.plays || 0) + ' plays';
             
-            // Hide action buttons if guest
             const actions = document.getElementById('detailActions');
             if (userProfile.isGuest) {
                 actions.querySelectorAll('.detail-icon-btn').forEach(btn => btn.style.display = 'none');
@@ -649,7 +684,6 @@
             if(!userProfile.isGuest) { sb.from('songs').update({ plays: (song.plays || 0) + 1 }).eq('id', song.id); }
             song.plays = (song.plays || 0) + 1;
 
-            // Build Queue
             let contextSongs = []; 
             if (currentView === 'playlist') { const p = myPlaylists.find(p => p.id == currentPlaylistId); if (p) contextSongs = mySongs.filter(s => p.songs.includes(s.id)); } 
             else if (currentView === 'search') { const searchQuery = document.getElementById('searchInput').value.toLowerCase(); contextSongs = mySongs.filter(s => s.title.toLowerCase().includes(searchQuery) || s.genre.toLowerCase().includes(searchQuery)); } 
@@ -729,13 +763,11 @@
         function addCurrentToPlaylist() { if (currentSongIndex !== -1) showAddToPlaylistModal(mySongs[currentSongIndex].id); }
         function confirmDeleteSong(songId) { songToDelete = songId; document.getElementById('deleteModal').classList.add('active'); }
         
-        // Live Deletion Fix
         document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
             if (!songToDelete) return;
             const song = mySongs.find(s => s.id === songToDelete);
             if (!song) return;
             
-            // 1. Delete from Storage
             if (song.audio) {
                 const p = song.audio.split('/novastream/')[1].split('?')[0];
                 if (p) await sb.storage.from('novastream').remove([decodeURIComponent(p)]);
@@ -745,15 +777,12 @@
                 if (p) await sb.storage.from('novastream').remove([decodeURIComponent(p)]);
             }
             
-            // 2. Delete from Database
             const { error } = await sb.from('songs').delete().eq('id', songToDelete);
             if (error) return alert("Error deleting song: " + error.message);
             
-            // 3. Live UI Update: Remove from local array immediately
             mySongs = mySongs.filter(s => s.id !== songToDelete);
-            activeQueue = activeQueue.filter(id => id !== songToDelete); // Remove from queue too
+            activeQueue = activeQueue.filter(id => id !== songToDelete); 
             
-            // 4. Handle player if the deleted song was playing
             if (mySongs[currentSongIndex] && mySongs[currentSongIndex].id === songToDelete) {
                 document.getElementById('audioPlayer').pause();
                 document.getElementById('audioPlayer').src = '';
@@ -765,13 +794,11 @@
                 document.getElementById('playerArt').innerText = '🎵';
             }
             
-            // 5. Close modal and refresh view
             document.getElementById('deleteModal').classList.remove('active');
             songToDelete = null;
             
-            // Go back to list view and re-render
             showView(currentView, document.querySelector('.nav-item.active'));
-            if (currentProfileViewId) openProfileView(currentProfileViewId); // Update profile grid if we are on it
+            if (currentProfileViewId) openProfileView(currentProfileViewId); 
         });
     </script>
 </body>
