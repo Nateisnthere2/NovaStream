@@ -350,6 +350,21 @@
         var isPlaying = false, isLooping = false;
         var tempAudioFile = null, tempAudioHash = null, tempCoverFile = null, tempPlaylistCoverFile = null, selectedGenre = null, songToDelete = null;
 
+        // --- Dynamic Default Cover Generator ---
+        function getDefaultCover(seed) {
+            let hash = 0;
+            for (let i = 0; i < seed.length; i++) {
+                hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const colors = [
+                ['#00d4ff', '#005eff'], ['#834d9b', '#d04ed6'], ['#11998e', '#38ef7d'],
+                ['#e65c00', '#f9d423'], ['#b21f1f', '#fdbb2d'], ['#2c3e50', '#4a1a40']
+            ];
+            const chosen = colors[Math.abs(hash) % colors.length];
+            const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='${chosen[0]}'/><stop offset='1' stop-color='${chosen[1]}'/></linearGradient></defs><rect width='100' height='100' fill='url(#g)'/><path d='M50 20 L54 46 L80 50 L54 54 L50 80 L46 54 L20 50 L46 46 Z' fill='rgba(255,255,255,0.2)'/><path d='M30 65 Q 20 50 30 35' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='4' stroke-linecap='round'/><path d='M70 65 Q 80 50 70 35' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='4' stroke-linecap='round'/></svg>`;
+            return 'data:image/svg+xml,' + encodeURIComponent(svg);
+        }
+
         // --- AUTHENTICATION FLOW ---
         window.onload = async function() {
             const { data: { session: activeSession } } = await sb.auth.getSession();
@@ -511,7 +526,7 @@
             const song = mySongs.find(s => s.id === songId); if (!song) return; const idx = mySongs.findIndex(s => s.id === songId);
             currentSongDetailView = { ...song, index: idx };
             document.getElementById('listView').style.display = 'none'; document.getElementById('profileView').style.display = 'none'; document.getElementById('songDetailView').style.display = 'flex';
-            document.getElementById('detailArt').src = song.cover || ''; document.getElementById('detailGenre').innerText = song.genre; document.getElementById('detailTitle').innerText = song.title; document.getElementById('detailUploader').innerText = song.uploader_name;
+            document.getElementById('detailArt').src = song.cover || getDefaultCover(song.id); document.getElementById('detailGenre').innerText = song.genre; document.getElementById('detailTitle').innerText = song.title; document.getElementById('detailUploader').innerText = song.uploader_name;
             document.getElementById('detailAvatar').innerHTML = song.uploader_avatar ? `<img src="${song.uploader_avatar}">` : '🎵';
             document.getElementById('detailDesc').innerText = song.description || 'No description provided.'; document.getElementById('detailPlays').innerText = (song.plays || 0) + ' plays';
             
@@ -539,7 +554,7 @@
             const actionsDiv = document.getElementById('profileViewActions');
             if (userId === userProfile.id) { actionsDiv.innerHTML = '<p style="color:var(--text-muted)">This is you!</p>'; } else { const { data: isFollowing } = await sb.from('follows').select('id').eq('follower_id', userProfile.id).eq('followed_id', userId); const { data: isBlocked } = await sb.from('blocks').select('id').eq('blocker_id', userProfile.id).eq('blocked_id', userId); actionsDiv.innerHTML = `<button class="follow-btn ${isFollowing.length > 0 ? 'following' : ''}" onclick="toggleFollow('${userId}')">${isFollowing.length > 0 ? 'Following' : 'Follow'}</button><button class="block-btn ${isBlocked.length > 0 ? 'blocked' : ''}" onclick="toggleBlock('${userId}')">${isBlocked.length > 0 ? 'Blocked' : 'Block'}</button>`; }
             const grid = document.getElementById('profileViewGrid'); grid.innerHTML = '';
-            userSongs.forEach(song => { const idx = mySongs.findIndex(s => s.id === song.id); const card = document.createElement('div'); card.className = 'song-card'; card.innerHTML = `<div class="song-art" onclick="openSongView('${song.id}')">${song.cover ? `<img src="${song.cover}">` : '🎵'}<div class="play-overlay" onclick="event.stopPropagation(); playSong(${idx})"><svg width="20" height="20" viewBox="0 0 24 24" fill="#000"><path d="M8 5v14l11-7z"/></svg></div></div><div class="song-title" onclick="openSongView('${song.id}')">${song.title}</div><div class="song-artist">${song.genre}</div>`; grid.appendChild(card); });
+            userSongs.forEach(song => { const idx = mySongs.findIndex(s => s.id === song.id); const card = document.createElement('div'); card.className = 'song-card'; card.innerHTML = `<div class="song-art" onclick="openSongView('${song.id}')">${song.cover ? `<img src="${song.cover}">` : `<img src="${getDefaultCover(song.id)}">`}<div class="play-overlay" onclick="event.stopPropagation(); playSong(${idx})"><svg width="20" height="20" viewBox="0 0 24 24" fill="#000"><path d="M8 5v14l11-7z"/></svg></div></div><div class="song-title" onclick="openSongView('${song.id}')">${song.title}</div><div class="song-artist">${song.genre}</div>`; grid.appendChild(card); });
         }
         async function toggleFollow(userId) { if (userProfile.isGuest) return alert("Please sign in to follow users."); const { data: ex } = await sb.from('follows').select('id').eq('follower_id', userProfile.id).eq('followed_id', userId); if (ex && ex.length > 0) { await sb.from('follows').delete().eq('follower_id', userProfile.id).eq('followed_id', userId); } else { await sb.from('follows').insert([{ follower_id: userProfile.id, followed_id: userId }]); } openProfileView(userId); }
         async function toggleBlock(userId) { if (userProfile.isGuest) return alert("Please sign in to block users."); const { data: ex } = await sb.from('blocks').select('id').eq('blocker_id', userProfile.id).eq('blocked_id', userId); if (ex && ex.length > 0) { await sb.from('blocks').delete().eq('blocker_id', userProfile.id).eq('blocked_id', userId); } else { await sb.from('blocks').insert([{ blocker_id: userProfile.id, blocked_id: userId }]); } openProfileView(userId); }
@@ -550,7 +565,7 @@
             if (currentView === 'library') songsToRender = mySongs; else if (currentView === 'search') songsToRender = mySongs.filter(s => s.title.toLowerCase().includes(searchQuery) || s.genre.toLowerCase().includes(searchQuery)); else if (currentView === 'liked') songsToRender = mySongs.filter(s => s.liked); else if (currentView === 'favorites') songsToRender = mySongs.filter(s => s.favorited); else if (currentView === 'playlist') { const p = myPlaylists.find(p => p.id == currentPlaylistId); if (p) songsToRender = mySongs.filter(s => p.songs.includes(s.id)); }
             const grid = document.getElementById('musicGrid'); grid.innerHTML = '';
             if (songsToRender.length === 0) { grid.innerHTML = '<div class="empty-state">No songs found.</div>'; return; }
-            songsToRender.forEach(song => { const idx = mySongs.findIndex(s => s.id === song.id); const card = document.createElement('div'); card.className = 'song-card'; let deleteBtn = ''; if (song.uploader_id === userProfile.id) deleteBtn = `<div class="card-action-btn delete-song-btn" onclick="event.stopPropagation(); confirmDeleteSong('${song.id}')" title="Delete"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></div>`; card.innerHTML = `<div class="song-art" onclick="openSongView('${song.id}')">${song.cover ? `<img src="${song.cover}" onerror="this.style.display='none'">` : '🎵'}<div class="play-overlay" onclick="event.stopPropagation(); playSong(${idx})"><svg width="20" height="20" viewBox="0 0 24 24" fill="#000"><path d="M8 5v14l11-7z"/></svg></div></div>${deleteBtn}<div class="card-action-btn add-to-playlist-btn" onclick="event.stopPropagation(); showAddToPlaylistModal('${song.id}')" title="Add to Playlist"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg></div><div class="song-title" onclick="openSongView('${song.id}')">${song.title}</div><div class="song-uploader" onclick="event.stopPropagation(); openProfileView('${song.uploader_id}')">Uploaded by: ${song.uploader_name}</div>`; grid.appendChild(card); });
+            songsToRender.forEach(song => { const idx = mySongs.findIndex(s => s.id === song.id); const card = document.createElement('div'); card.className = 'song-card'; let deleteBtn = ''; if (song.uploader_id === userProfile.id) deleteBtn = `<div class="card-action-btn delete-song-btn" onclick="event.stopPropagation(); confirmDeleteSong('${song.id}')" title="Delete"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></div>`; card.innerHTML = `<div class="song-art" onclick="openSongView('${song.id}')">${song.cover ? `<img src="${song.cover}" onerror="this.style.display='none'">` : `<img src="${getDefaultCover(song.id)}">`}<div class="play-overlay" onclick="event.stopPropagation(); playSong(${idx})"><svg width="20" height="20" viewBox="0 0 24 24" fill="#000"><path d="M8 5v14l11-7z"/></svg></div></div>${deleteBtn}<div class="card-action-btn add-to-playlist-btn" onclick="event.stopPropagation(); showAddToPlaylistModal('${song.id}')" title="Add to Playlist"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg></div><div class="song-title" onclick="openSongView('${song.id}')">${song.title}</div><div class="song-uploader" onclick="event.stopPropagation(); openProfileView('${song.uploader_id}')">Uploaded by: ${song.uploader_name}</div>`; grid.appendChild(card); });
         }
         function showCreatePlaylistModal() { document.getElementById('playlistModal').classList.add('active'); document.getElementById('playlistNameInput').focus(); }
         function previewPlaylistCover(input) { if (input.files && input.files[0]) { tempPlaylistCoverFile = input.files[0]; document.getElementById('pCoverFileName').innerText = input.files[0].name; document.getElementById('pCoverLabel').classList.add('has-file'); } }
@@ -563,7 +578,9 @@
             const ap = document.getElementById('audioPlayer'); ap.src = song.audio; ap.play();
             isPlaying = true; updatePlayPauseIcon(); updatePlayerActionsUI();
             document.getElementById('playerTitle').innerText = song.title; document.getElementById('playerArtist').innerText = song.uploader_name;
-            const pa = document.getElementById('playerArt'); if (song.cover) { pa.innerHTML = `<img src="${song.cover}" onerror="this.parentElement.innerHTML='🎵'">`; pa.style.boxShadow = '0 0 25px rgba(0,212,255,0.5)'; } else { pa.innerHTML = '🎵'; pa.style.boxShadow = 'none'; }
+            const pa = document.getElementById('playerArt'); 
+            if (song.cover) { pa.innerHTML = `<img src="${song.cover}" onerror="this.parentElement.innerHTML='🎵'">`; pa.style.boxShadow = '0 0 25px rgba(0,212,255,0.5)'; } 
+            else { pa.innerHTML = `<img src="${getDefaultCover(song.id)}">`; pa.style.boxShadow = 'none'; }
             if(!userProfile.isGuest) { sb.from('songs').update({ plays: (song.plays || 0) + 1 }).eq('id', song.id); }
             song.plays = (song.plays || 0) + 1;
             renderUI();
